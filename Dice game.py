@@ -1,35 +1,46 @@
 import random
+import time
+from operator import itemgetter
 
 def validate():
-    validated = False
-    while validated == False:
-        username = input("enter your username")
-        password = input("enter your password")
-        userpass_list = []
+    choice = int(input("1) Log in\n2) sign up"))
+    if choice == 1:
+        while username == provided_username and password == provided_password:
+            provided_username = input("enter your username")
+            provided_password = input("enter your password")
+            return provided_username
 
-        file = open("userandpass.txt", "r")
+            file = open("userandpass.txt", "r")
+            for line in file:
+                username, password = line.split(',')
+                print(username, password)
+                if username == provided_username and password == provided_password:
+                    print("username and password accepted")
 
-        for line in file:
-            userpass_list.append(line.strip().split(","))
+    elif choice == 2:
+        username = input("enter your desired username")
+        password = input("enter your desired psasword")
+        file = open("userandpass.txt", "a")
+        file.write("\n")
+        file.write(username,",",password)
+        f.close()
 
-        if [username, password] in userpass_list:
-            print("you can continue")
-            validated = True
-        else:
-            print("error: your username and password do not match")
+            
 
-        file.close()
-
+                
 
 def play_game(p1_name, p2_name):
+    p2_score = 0
+    p1_score = 0
     for x in range(5):
         round_total = scoring()
         p1_score = p1_score + round_total
 
         round_total = scoring()
         p2_score = p2_score + round_total
-        print("after round", x, p1_name, "scored: ", p1_score)
-        print("after round", x, p2_name, "scored: ", p2_score)
+        time.sleep(2)
+        print("after round", x+1, p1_name, "is on: ", p1_score)
+        print("after round", x+1, p2_name, "is on: ", p2_score)
 
     return p1_score, p2_score
 
@@ -71,7 +82,7 @@ def judging(p1_name, p1_score, p2_name, p2_score):
 
 def overtime(p1_name, p1_score, p2_name, p2_score):
     print('''you will erach roll one dice until one person rolls a dice that is higher 
-            than the other persons''')
+    than the other persons''')
     
     winner_found = False
     while winner_found == False:
@@ -86,22 +97,39 @@ def overtime(p1_name, p1_score, p2_name, p2_score):
 
 
 def winners_file(winner_name, winner_score):
-    winners_list = []
-    f = open("winnersfile.txt", "r+a")
-    for line in f:
-        winners_list.append(line.strip().split(","))
-        winners_list.sort(key=lambda x: x[1])
+    leaderboard = open("winnersfile.txt", "a")
+    leaderboard.write(str(winner_score) + "," + winner_name)
+    leaderboard.write("\n")
+    print("Your score has been saved")
+    leaderboard.close()
     
-    winners_list.append(winner_name, ",", winner_score)
-    for x in winners_list:
-        f.write(x)
+    leaderboard = open("winnersfile.txt", "r")
+    scores = leaderboard.readlines()
+    unsortedScores = []
+    for lines in scores:
+        details = lines.strip("\n") 
+        details = details.split(",")
+        details[0] = int(details[0])
+        unsortedScores.append(details)
+    unsortedScores.sort(key = itemgetter(0), reverse=True)
+    print("------------------------------------------------------------------")
+    print("                      The top five scores are:                    ")
+    print("------------------------------------------------------------------")
+    print("1. "+str(unsortedScores[0][0]),"done by",str(unsortedScores[0][1]))
+    print("2. "+str(unsortedScores[1][0]),"done by",str(unsortedScores[1][1]))
+    print("3. "+str(unsortedScores[2][0]),"done by",str(unsortedScores[2][1]))
+    print("4. "+str(unsortedScores[3][0]),"done by",str(unsortedScores[3][1]))
+    print("5. "+str(unsortedScores[4][0]),"done by",str(unsortedScores[4][1]))
 
-    f.close()
-    return winners_list
+    leaderboard.close()
+
+
 
 def main():
+    print("-------WELCOME TO THE DICE GAME--------")
+    print("-----------------USER 1----------------")
     p1_name = validate()
-    print("now user 2")
+    print("-----------------USER 2----------------")
     p2_name = validate()
 
     p1_score, p2_score = play_game(p1_name, p2_name)
@@ -110,9 +138,7 @@ def main():
 
     print(winner_name, "won with a score of: ", winner_score)
 
-    winners = winners_file(winner_name, winner_score)
-    for x in range(5):
-        print("the top 5 are: ", winners[x])
+    winners_file(winner_name, winner_score)
 
 
 

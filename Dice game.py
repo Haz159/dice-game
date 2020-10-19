@@ -3,27 +3,33 @@ import time
 from operator import itemgetter
 
 def validate():
-    choice = int(input("1) Log in\n2) sign up"))
-    if choice == 1:
-        while username == provided_username and password == provided_password:
-            provided_username = input("enter your username")
-            provided_password = input("enter your password")
-            return provided_username
-
-            file = open("userandpass.txt", "r")
+    validated = False
+    while validated == False:
+        choice = int(input("enter your choice (1 or 2):\n1) Log in\n2) sign up"))
+        if choice == 1:
+            username = input("Enter your username: ")
+            password = input("Enter your password: ")
+            usernames_passwords = []
+            file = open("userandpass.txt","r")
             for line in file:
-                username, password = line.split(',')
-                print(username, password)
-                if username == provided_username and password == provided_password:
-                    print("username and password accepted")
-
-    elif choice == 2:
-        username = input("enter your desired username")
-        password = input("enter your desired psasword")
-        file = open("userandpass.txt", "a")
-        file.write("\n")
-        file.write(username,",",password)
-        f.close()
+                usernames_passwords.append(line.strip().split(","))
+                 
+            file.close()
+            if [username, password] in usernames_passwords:
+                print("Authentication success! you can continue")
+                return username
+                validated = True
+            else:
+                print("Error! username or password is incorrect, please try again")
+                
+        elif choice == 2:
+            username = input("enter your desired username")
+            password = input("enter your desired psasword")
+            file = open("userandpass.txt", "a")
+            file.write("\n")
+            file.write(username + "," + password)
+            file.close()
+            print("account made.")
 
             
 
@@ -32,12 +38,18 @@ def validate():
 def play_game(p1_name, p2_name):
     p2_score = 0
     p1_score = 0
+    
     for x in range(5):
         round_total = scoring()
-        p1_score = p1_score + round_total
+        p1_score += round_total
+        if p1_score < 0:
+            p1_score = 0
 
         round_total = scoring()
-        p2_score = p2_score + round_total
+        p2_score += round_total
+        if p2_score < 0:
+            p2_score = 0
+        
         time.sleep(2)
         print("after round", x+1, p1_name, "is on: ", p1_score)
         print("after round", x+1, p2_name, "is on: ", p2_score)
@@ -63,9 +75,6 @@ def scoring():
     if die1 == die2:
         die3 = random.randint(1,6)
         score += die3
-
-    if score < 0:
-        score = 0
 
     return score
 
